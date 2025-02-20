@@ -8,6 +8,7 @@ import cv2 as cv
 import mediapipe as mp
 import numpy as np
 import pydirectinput
+from time import sleep
 
 from model import KeyPointClassifier, PointHistoryClassifier
 from KeyboardController import Mouse, Keyboard
@@ -85,47 +86,62 @@ def main():
                     if (prev_wrists != None) and (hand_sign_id == 1):
                         speed = (wrist[0] - prev_wrists[0], wrist[1] - prev_wrists[1])
                         sensetivity = 3
-                        #pydirectinput.move(int((speed[0])*sensetivity/WIDTH*cap_width), int((speed[1])*sensetivity/HEIGHT*cap_height))
-                        pydirectinput.move(int((speed[0])), int((speed[1])))
+                        pydirectinput.move(int((speed[0])*sensetivity/WIDTH*cap_width), int((speed[1])*sensetivity/HEIGHT*cap_height)) #optimal settings for mine craft
+                        #pydirectinput.move(int((speed[0])), int((speed[1]))) #optimal settings for roblox
+
                     prev_wrists = wrist
                 if handedness.classification[0].label == "Right" and hand_sign_id == 2:
-                    direction = calc_direction(landmark_list[8], landmark_list[5])
+                    direction = calc_direction(landmark_list[8], landmark_list[5], hand_sign_id)
                     if direction == "left":
-                        mouse.click(mouse.left)
+                        pydirectinput.leftClick()
                     if direction == "right":
-                        mouse.click(mouse.right)
+                        pydirectinput.rightClick()
                 if handedness.classification[0].label == "Left" and hand_sign_id == 2:
-                    direction = calc_direction(landmark_list[8], landmark_list[5])
+                    direction = calc_direction(landmark_list[8], landmark_list[5], hand_sign_id)
                     if direction == "bottom":
                         if key_s == False:
-                            keyboard.hold(keyboard.Key.s)
-                        key_s = True
+                            #keyboard.hold(keyboard.Key.s)
+                            pydirectinput.keyDown('s')
+                            key_s = True
                     else:
                         key_s = False
-                        keyboard.release(keyboard.Key.s)
+                        #keyboard.release(keyboard.Key.s)
+                        pydirectinput.keyUp('s')
+
                     if direction == "top":
                         if key_w == False:
-                            keyboard.hold(keyboard.Key.w)
+                            #keyboard.hold(keyboard.Key.w)
+                            pydirectinput.keyDown('w')
                         key_w = True
                     else:
                         key_w = False
-                        keyboard.release(keyboard.Key.w)
+                        #keyboard.release(keyboard.Key.w)
+                        pydirectinput.keyUp('w')
+
                     if direction == "left":
                         if key_a == False:
-                            keyboard.hold(keyboard.Key.a)
+                            #keyboard.hold(keyboard.Key.a)
+                            pydirectinput.keyDown('a')
                         key_a = True
                     else:
                         key_a = False
-                        keyboard.release(keyboard.Key.a)
+                        #keyboard.release(keyboard.Key.a)
+                        pydirectinput.keyUp('a')
+
+                        
                     if direction == "right":
                         if key_d == False:
-                            keyboard.hold(keyboard.Key.d)
+                            #keyboard.hold(keyboard.Key.d)
+                            pydirectinput.keyDown('d')
                         key_d = True
                     else:
                         key_d = False
-                        keyboard.release(keyboard.Key.d)
+                        #keyboard.release(keyboard.Key.d)
+                        pydirectinput.keyUp('d')
+
+
                 if handedness.classification[0].label == "Left" and hand_sign_id == 0:
-                    keyboard.press(keyboard.Key.SPACE)
+                    pydirectinput.press('space')
                     key_d = False
                     key_w = False
                     key_a = False
@@ -136,7 +152,7 @@ def main():
                     keyboard.release(keyboard.Key.w) 
                      
                 if handedness.classification[0].label == "Left" and hand_sign_id == 3:
-                    keyboard.press(keyboard.Key.e) 
+                    pydirectinput.press('e') 
                     key_d = False
                     key_w = False
                     key_a = False
@@ -150,10 +166,10 @@ def main():
                     key_w = False
                     key_a = False
                     key_s = False   
-                    keyboard.release(keyboard.Key.d)
-                    keyboard.release(keyboard.Key.a)
-                    keyboard.release(keyboard.Key.s)
-                    keyboard.release(keyboard.Key.w)
+                    pydirectinput.keyUp('w')
+                    pydirectinput.keyUp('a')
+                    pydirectinput.keyUp('d')
+                    pydirectinput.keyUp('s')
 
                 
                 debug_image = draw_bounding_rect(debug_image, brect)
@@ -166,7 +182,7 @@ def main():
                 )
         cv.imshow('Hand Gesture Recognition', debug_image)
 
-def calc_direction(tip_index, root_index):
+def calc_direction(tip_index, root_index, hand_sign_id):
     x_dir = root_index[0] - tip_index[0]
     y_dir = root_index[1]-tip_index[1]
 
@@ -194,7 +210,6 @@ def calc_direction(tip_index, root_index):
             else:
                 return "bottom"
         else:
-            print("EEEE")
             if x_dir >= 0:
                 return "right"
             else:

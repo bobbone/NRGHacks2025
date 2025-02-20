@@ -92,12 +92,3 @@ class Mouse:
                 """Release button"""
                 user32.mouse_event(button[1])
                 sleep(delay)
-
-def send_key(window_title, key_code):
-    hwnd = win32gui.FindWindow(None, window_title)  # Find window by title
-    if hwnd:
-        print("found window!")
-        # Sending a key down event (pressing a key)
-        user32.SendMessageW(hwnd, WM_KEYDOWN, key_code, 0)
-        # Sending a key up event (releasing a key)
-        user32.SendMessageW(hwnd, WM_KEYUP, key_code, 0)
